@@ -6,11 +6,22 @@ import { Slider } from "@/components/ui/slider";
 import { Check } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
+// Define a specific type for our rating object to ensure type safety
+type RatingFields = {
+  food: number;
+  drinks: number;
+  price: number;
+  ambience: number;
+  service: number;
+  time: number;
+  infrastructure: number;
+};
+
 interface ReviewFormProps {
   showReviewForm: boolean;
   setShowReviewForm: (show: boolean) => void;
-  reviewRating: Record<string, number>;
-  setReviewRating: (rating: Record<string, number> | ((prev: Record<string, number>) => Record<string, number>)) => void;
+  reviewRating: RatingFields;
+  setReviewRating: React.Dispatch<React.SetStateAction<RatingFields>>;
   reviewText: string;
   setReviewText: (text: string) => void;
   selectedTags: string[];
@@ -56,7 +67,7 @@ export const ReviewForm = ({
                 <h3 className="text-sm font-medium mb-2">{label}:</h3>
                 <div className="flex items-center gap-2">
                   <Slider
-                    value={[reviewRating[key as keyof typeof reviewRating]]}
+                    value={[reviewRating[key as keyof RatingFields]]}
                     min={1}
                     max={5}
                     step={0.5}
@@ -69,7 +80,7 @@ export const ReviewForm = ({
                     className="w-full"
                   />
                   <div className="flex ml-2">
-                    {renderStars(reviewRating[key as keyof typeof reviewRating])}
+                    {renderStars(reviewRating[key as keyof RatingFields])}
                   </div>
                 </div>
               </div>

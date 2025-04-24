@@ -11,13 +11,24 @@ import { RestaurantInfo } from "@/components/restaurant/RestaurantInfo";
 import { ReviewsList } from "@/components/restaurant/ReviewsList";
 import { ReviewForm } from "@/components/restaurant/ReviewForm";
 
+// Define the same rating type to ensure consistency
+type RatingFields = {
+  food: number;
+  drinks: number;
+  price: number;
+  ambience: number;
+  service: number;
+  time: number;
+  infrastructure: number;
+};
+
 const RestaurantDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isFavorite, setIsFavorite] = useState(false);
   const [showReviewForm, setShowReviewForm] = useState(false);
-  const [reviewRating, setReviewRating] = useState({
+  const [reviewRating, setReviewRating] = useState<RatingFields>({
     food: 5,
     drinks: 5,
     price: 5,
@@ -147,13 +158,7 @@ const RestaurantDetailPage = () => {
         showReviewForm={showReviewForm}
         setShowReviewForm={setShowReviewForm}
         reviewRating={reviewRating}
-        setReviewRating={(rating) => {
-          if (typeof rating === 'function') {
-            setReviewRating(rating);
-          } else {
-            setReviewRating(rating);
-          }
-        }}
+        setReviewRating={setReviewRating}
         reviewText={reviewText}
         setReviewText={setReviewText}
         selectedTags={selectedTags}
