@@ -147,7 +147,13 @@ const RestaurantDetailPage = () => {
         showReviewForm={showReviewForm}
         setShowReviewForm={setShowReviewForm}
         reviewRating={reviewRating}
-        setReviewRating={setReviewRating}
+        setReviewRating={(rating) => {
+          if (typeof rating === 'function') {
+            setReviewRating(rating);
+          } else {
+            setReviewRating(rating);
+          }
+        }}
         reviewText={reviewText}
         setReviewText={setReviewText}
         selectedTags={selectedTags}

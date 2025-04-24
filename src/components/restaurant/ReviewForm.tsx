@@ -10,7 +10,7 @@ interface ReviewFormProps {
   showReviewForm: boolean;
   setShowReviewForm: (show: boolean) => void;
   reviewRating: Record<string, number>;
-  setReviewRating: (rating: Record<string, number>) => void;
+  setReviewRating: (rating: Record<string, number> | ((prev: Record<string, number>) => Record<string, number>)) => void;
   reviewText: string;
   setReviewText: (text: string) => void;
   selectedTags: string[];
@@ -61,7 +61,7 @@ export const ReviewForm = ({
                     max={5}
                     step={0.5}
                     onValueChange={([value]) => 
-                      setReviewRating(prev => ({
+                      setReviewRating((prev) => ({
                         ...prev,
                         [key]: value
                       }))
