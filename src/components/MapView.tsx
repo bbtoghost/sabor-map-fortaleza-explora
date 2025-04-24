@@ -1,5 +1,5 @@
 
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import {
   Select,
   SelectContent,
@@ -8,17 +8,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Search, MapPin, Locate } from "lucide-react";
+import { Search, Locate } from "lucide-react";
 import { restaurants } from "@/data/restaurants";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const MapView = () => {
   const [filter, setFilter] = useState("distance");
   const [filterType, setFilterType] = useState("all");
-  const mapRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   
   const handleRestaurantClick = (id: string) => {
     navigate(`/restaurant/${id}`);
@@ -42,10 +43,10 @@ const MapView = () => {
 
   return (
     <div className="relative w-full h-full">
-      {/* Filter Section */}
-      <div className="absolute top-4 left-4 right-4 z-10 flex gap-2 overflow-x-auto pb-1">
+      {/* Filter Section - Mobile Optimized */}
+      <div className="absolute top-2 left-2 right-2 z-10 flex gap-2 overflow-x-auto pb-1">
         <Select value={filter} onValueChange={setFilter}>
-          <SelectTrigger className="w-[120px] bg-background/80 backdrop-blur-sm">
+          <SelectTrigger className="w-[110px] bg-background/95 backdrop-blur-sm text-sm">
             <SelectValue placeholder="Distância" />
           </SelectTrigger>
           <SelectContent>
@@ -57,7 +58,7 @@ const MapView = () => {
         </Select>
         
         <Select value={filterType} onValueChange={setFilterType}>
-          <SelectTrigger className="w-[120px] bg-background/80 backdrop-blur-sm">
+          <SelectTrigger className="w-[110px] bg-background/95 backdrop-blur-sm text-sm">
             <SelectValue placeholder="Tipo" />
           </SelectTrigger>
           <SelectContent>
@@ -71,32 +72,32 @@ const MapView = () => {
         </Select>
       </div>
 
-      {/* Floating Buttons */}
-      <div className="absolute bottom-6 right-4 flex flex-col gap-2 z-10">
+      {/* Floating Buttons - Mobile Optimized */}
+      <div className="absolute bottom-4 right-2 flex flex-col gap-2 z-10">
         <Button
           size="icon"
-          className="rounded-full bg-secondary text-secondary-foreground shadow-lg h-12 w-12"
+          className="rounded-full bg-background/95 backdrop-blur-sm text-foreground shadow-lg h-10 w-10"
           onClick={handleLocationClick}
         >
-          <Locate />
+          <Locate className="h-5 w-5" />
         </Button>
         <Button
           size="icon"
-          className="rounded-full bg-primary text-primary-foreground shadow-lg h-12 w-12"
+          className="rounded-full bg-primary text-primary-foreground shadow-lg h-10 w-10"
         >
-          <Search />
+          <Search className="h-5 w-5" />
         </Button>
       </div>
 
-      {/* Map Image */}
-      <div className="absolute inset-0 bg-muted" ref={mapRef}>
+      {/* Map Container with New Image */}
+      <div className="absolute inset-0 bg-muted overflow-hidden">
         <img
-          src="https://images.unsplash.com/photo-1526778548025-fa2f459cd5ce?ixlib=rb-1.2.1&auto=format&fit=crop&q=80&w=1000"
+          src="/lovable-uploads/ad84066a-0453-425b-b53b-7aeeef46dc57.png"
           alt="Mapa de Fortaleza"
           className="w-full h-full object-cover"
         />
         
-        {/* Restaurant pins */}
+        {/* Restaurant pins - Mobile Optimized */}
         {restaurants
           .filter(r => filterType === "all" || r.type.toLowerCase() === filterType)
           .map((restaurant) => (
@@ -104,12 +105,12 @@ const MapView = () => {
               key={restaurant.id}
               className="absolute transition-all duration-200 cursor-pointer transform -translate-x-1/2 -translate-y-1/2 hover:scale-110"
               style={{
-                top: `${restaurant.location.lat / -4 * 100}%`,  // Simplified mapping for demo
-                left: `${restaurant.location.lng / -38.6 * 100}%`,  // Simplified mapping for demo
+                top: `${restaurant.location.lat / -4 * 100}%`,
+                left: `${restaurant.location.lng / -38.6 * 100}%`,
               }}
               onClick={() => handleRestaurantClick(restaurant.id)}
             >
-              <div className="w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center shadow-lg animate-pulse">
+              <div className={`flex items-center justify-center shadow-lg animate-pulse ${isMobile ? 'w-6 h-6' : 'w-8 h-8'} bg-background/95 backdrop-blur-sm rounded-full`}>
                 {restaurant.type === "Doceria" && "🍰"}
                 {restaurant.type === "Frutos do Mar" && "🦐"}
                 {restaurant.type === "Pizza e Sushi" && "🍕"}
@@ -121,7 +122,7 @@ const MapView = () => {
                 {restaurant.type === "Vegetariano/Vegano" && "🥗"}
                 {restaurant.type === "Bar e Petiscos" && "🍻"}
               </div>
-              <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 whitespace-nowrap bg-background/80 backdrop-blur-sm text-xs px-2 py-1 rounded-full">
+              <div className={`absolute -bottom-5 left-1/2 transform -translate-x-1/2 whitespace-nowrap bg-background/95 backdrop-blur-sm ${isMobile ? 'text-[10px] px-1.5' : 'text-xs px-2'} py-1 rounded-full shadow-sm`}>
                 {restaurant.name}
               </div>
             </div>
