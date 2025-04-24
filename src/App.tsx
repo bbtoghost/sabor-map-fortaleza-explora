@@ -1,4 +1,5 @@
 
+import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -14,35 +15,38 @@ import RankingPage from "./pages/Rankings";
 import RestaurantDetailPage from "./pages/RestaurantDetail";
 import UserProfilePage from "./pages/UserProfile";
 
-const queryClient = new QueryClient();
+const App = () => {
+  // Create a new QueryClient instance inside the component
+  const [queryClient] = React.useState(() => new QueryClient());
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Navigate to="/login" replace />} />
-          <Route path="/login" element={<Login />} />
-          
-          <Route path="/" element={<AppLayout />}>
-            <Route path="/home" element={<HomePage />}>
-              <Route path="map" element={<MapView />} />
-              <Route path="list" element={<ListView />} />
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route path="/login" element={<Login />} />
+            
+            <Route path="/" element={<AppLayout />}>
+              <Route path="/home" element={<HomePage />}>
+                <Route path="map" element={<MapView />} />
+                <Route path="list" element={<ListView />} />
+              </Route>
+              <Route path="/favorites" element={<FavoritesPage />} />
+              <Route path="/rankings" element={<RankingPage />} />
+              <Route path="/restaurant/:id" element={<RestaurantDetailPage />} />
+              <Route path="/profile" element={<UserProfilePage />} />
             </Route>
-            <Route path="/favorites" element={<FavoritesPage />} />
-            <Route path="/rankings" element={<RankingPage />} />
-            <Route path="/restaurant/:id" element={<RestaurantDetailPage />} />
-            <Route path="/profile" element={<UserProfilePage />} />
-          </Route>
-          
-          {/* Catch-all route */}
-          <Route path="*" element={<Navigate to="/login" replace />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+            
+            {/* Catch-all route */}
+            <Route path="*" element={<Navigate to="/login" replace />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
