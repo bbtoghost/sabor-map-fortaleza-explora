@@ -4,13 +4,34 @@ import { restaurants } from "@/data/restaurants";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Heart, MapPin, Phone, Route } from "lucide-react";
+import { ArrowLeft, Heart, MapPin, Phone, Route, Clock, Check, Star } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useToast } from "@/hooks/use-toast";
+import { Slider } from "@/components/ui/slider";
+import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 const RestaurantDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [isFavorite, setIsFavorite] = useState(false);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewText, setReviewText] = useState("");
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [allTags] = useState([
+    "Ambiente Familiar", 
+    "Romântico", 
+    "Vista Mar", 
+    "Preço Justo", 
+    "Música ao Vivo", 
+    "Bom Atendimento",
+    "Área Kids",
+    "Pet Friendly",
+    "Wi-Fi Grátis",
+    "Estacionamento"
+  ]);
 
   const restaurant = restaurants.find(r => r.id === id);
 
@@ -24,6 +45,36 @@ const RestaurantDetailPage = () => {
 
   const handleFavoriteClick = () => {
     setIsFavorite(!isFavorite);
+    toast({
+      title: isFavorite ? "Removido dos favoritos" : "Adicionado aos favoritos",
+      description: isFavorite ? `${restaurant.name} foi removido da sua lista de favoritos` : `${restaurant.name} foi adicionado à sua lista de favoritos`,
+    });
+  };
+
+  const handleCheckIn = () => {
+    toast({
+      title: "Check-in realizado!",
+      description: `Você está em ${restaurant.name}. Boa refeição!`,
+    });
+    setShowReviewForm(true);
+  };
+
+  const handleTagToggle = (tag: string) => {
+    if (selectedTags.includes(tag)) {
+      setSelectedTags(selectedTags.filter(t => t !== tag));
+    } else {
+      setSelectedTags([...selectedTags, tag]);
+    }
+  };
+
+  const handleSubmitReview = () => {
+    toast({
+      title: "Avaliação enviada!",
+      description: "Obrigado pelo seu feedback. Você ganhou 25 pontos!",
+    });
+    setShowReviewForm(false);
+    setReviewText("");
+    setSelectedTags([]);
   };
 
   const renderPriceRange = () => {
@@ -114,6 +165,18 @@ const RestaurantDetailPage = () => {
             </Button>
           </div>
 
+          {/* Check-in Button */}
+          <div className="mt-4">
+            <Button 
+              variant="default" 
+              className="w-full flex items-center justify-center gap-2"
+              onClick={handleCheckIn}
+            >
+              <MapPin className="h-5 w-5" />
+              <span>Estou aqui agora!</span>
+            </Button>
+          </div>
+
           <Tabs defaultValue="info" className="mt-6">
             <TabsList className="grid grid-cols-3 w-full">
               <TabsTrigger value="info">Informações</TabsTrigger>
@@ -168,6 +231,15 @@ const RestaurantDetailPage = () => {
                         </div>
                       </div>
                       <p className="text-muted-foreground mt-3">{comment.text}</p>
+                      {comment.tags && comment.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {comment.tags.map((tag, index) => (
+                            <Badge key={index} variant="outline" className="text-xs">
+                              {tag}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -185,6 +257,65 @@ const RestaurantDetailPage = () => {
           </Tabs>
         </div>
       </div>
+
+      {/* Review Form Dialog */}
+      <Dialog open={showReviewForm} onOpenChange={setShowReviewForm}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Avaliar {restaurant.name}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <h3 className="text-sm font-medium mb-2">Sua nota:</h3>
+              <div className="flex items-center gap-2">
+                <Slider
+                  value={[reviewRating]}
+                  min={1}
+                  max={5}
+                  step={1}
+                  onValueChange={([value]) => setReviewRating(value)}
+                  className="w-full"
+                />
+                <div className="flex ml-2">
+                  {renderStars(reviewRating)}
+                </div>
+              </div>
+            </div>
+            
+            <div>
+              <h3 className="text-sm font-medium mb-2">Seu comentário:</h3>
+              <Textarea
+                value={reviewText}
+                onChange={(e) => setReviewText(e.target.value)}
+                placeholder="Como foi sua experiência?"
+                className="min-h-20"
+              />
+            </div>
+            
+            <div>
+              <h3 className="text-sm font-medium mb-2">Selecione as tags que se aplicam:</h3>
+              <div className="flex flex-wrap gap-2">
+                {allTags.map((tag) => (
+                  <Badge
+                    key={tag}
+                    variant={selectedTags.includes(tag) ? "default" : "outline"}
+                    className="cursor-pointer"
+                    onClick={() => handleTagToggle(tag)}
+                  >
+                    {selectedTags.includes(tag) && <Check className="mr-1 h-3 w-3" />}
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+            
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setShowReviewForm(false)}>Cancelar</Button>
+              <Button onClick={handleSubmitReview}>Enviar Avaliação</Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Favorite Button */}
       <div className="fixed bottom-20 right-4">

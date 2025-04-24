@@ -2,7 +2,7 @@
 import { Outlet } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Heart, Map, List, Search, Star } from "lucide-react";
+import { Heart, Map, List, Search, Star, User } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 import { useEffect, useState } from "react";
 
@@ -20,6 +20,8 @@ const AppLayout = () => {
       setActiveTab("rankings");
     } else if (location.pathname === "/favorites") {
       setActiveTab("favorites");
+    } else if (location.pathname === "/profile") {
+      setActiveTab("profile");
     }
   }, [location.pathname]);
 
@@ -37,6 +39,9 @@ const AppLayout = () => {
         break;
       case "favorites":
         navigate("/favorites");
+        break;
+      case "profile":
+        navigate("/profile");
         break;
       default:
         navigate("/home");
@@ -64,7 +69,7 @@ const AppLayout = () => {
       {/* Bottom Navigation */}
       <div className="border-t bg-background">
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-          <TabsList className="w-full h-16 bg-transparent grid grid-cols-4">
+          <TabsList className="w-full h-16 bg-transparent grid grid-cols-5">
             <TabsTrigger value="map" className="flex flex-col items-center justify-center data-[state=active]:text-primary">
               <Map size={20} />
               <span className="text-xs mt-1">Mapa</span>
@@ -80,6 +85,10 @@ const AppLayout = () => {
             <TabsTrigger value="favorites" className="flex flex-col items-center justify-center data-[state=active]:text-primary">
               <Heart size={20} />
               <span className="text-xs mt-1">Favoritos</span>
+            </TabsTrigger>
+            <TabsTrigger value="profile" className="flex flex-col items-center justify-center data-[state=active]:text-primary">
+              <User size={20} />
+              <span className="text-xs mt-1">Perfil</span>
             </TabsTrigger>
           </TabsList>
         </Tabs>

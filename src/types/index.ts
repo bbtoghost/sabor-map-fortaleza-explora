@@ -30,6 +30,24 @@ export interface Comment {
   rating: number;
   text: string;
   date: string;
+  tags?: string[]; // Tags that the user selected for this restaurant
+}
+
+export interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  avatar: string;
+  points: number;
+  visitedRestaurants: UserVisit[];
+  reviews: string[]; // IDs of reviews made by this user
+  favorites: string[]; // IDs of favorite restaurants
+}
+
+export interface UserVisit {
+  restaurantId: string;
+  date: string;
+  hasReviewed: boolean;
 }
 
 export interface Ad {

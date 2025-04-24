@@ -12,6 +12,7 @@ import ListView from "./components/ListView";
 import FavoritesPage from "./pages/Favorites";
 import RankingPage from "./pages/Rankings";
 import RestaurantDetailPage from "./pages/RestaurantDetail";
+import UserProfilePage from "./pages/UserProfile";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +34,7 @@ const App = () => (
             <Route path="/favorites" element={<FavoritesPage />} />
             <Route path="/rankings" element={<RankingPage />} />
             <Route path="/restaurant/:id" element={<RestaurantDetailPage />} />
+            <Route path="/profile" element={<UserProfilePage />} />
           </Route>
           
           {/* Catch-all route */}
