@@ -1,4 +1,3 @@
-
 import { useNavigate, useParams } from "react-router-dom";
 import { restaurants } from "@/data/restaurants";
 import { useState } from "react";
@@ -17,7 +16,15 @@ const RestaurantDetailPage = () => {
   const { toast } = useToast();
   const [isFavorite, setIsFavorite] = useState(false);
   const [showReviewForm, setShowReviewForm] = useState(false);
-  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewRating, setReviewRating] = useState({
+    food: 5,
+    drinks: 5,
+    price: 5,
+    ambience: 5,
+    service: 5,
+    time: 5,
+    infrastructure: 5
+  });
   const [reviewText, setReviewText] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [allTags] = useState([
@@ -265,21 +272,39 @@ const RestaurantDetailPage = () => {
             <DialogTitle>Avaliar {restaurant.name}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <div>
-              <h3 className="text-sm font-medium mb-2">Sua nota:</h3>
-              <div className="flex items-center gap-2">
-                <Slider
-                  value={[reviewRating]}
-                  min={1}
-                  max={5}
-                  step={1}
-                  onValueChange={([value]) => setReviewRating(value)}
-                  className="w-full"
-                />
-                <div className="flex ml-2">
-                  {renderStars(reviewRating)}
+            {/* Rating Criteria */}
+            <div className="space-y-4">
+              {[
+                { key: 'food', label: 'Comidas' },
+                { key: 'drinks', label: 'Drinks' },
+                { key: 'price', label: 'Preço' },
+                { key: 'ambience', label: 'Ambiente' },
+                { key: 'service', label: 'Atendimento' },
+                { key: 'time', label: 'Tempo' },
+                { key: 'infrastructure', label: 'Estrutura' },
+              ].map(({ key, label }) => (
+                <div key={key}>
+                  <h3 className="text-sm font-medium mb-2">{label}:</h3>
+                  <div className="flex items-center gap-2">
+                    <Slider
+                      value={[reviewRating[key as keyof typeof reviewRating]]}
+                      min={1}
+                      max={5}
+                      step={0.5}
+                      onValueChange={([value]) => 
+                        setReviewRating(prev => ({
+                          ...prev,
+                          [key]: value
+                        }))
+                      }
+                      className="w-full"
+                    />
+                    <div className="flex ml-2">
+                      {renderStars(reviewRating[key as keyof typeof reviewRating])}
+                    </div>
+                  </div>
                 </div>
-              </div>
+              ))}
             </div>
             
             <div>

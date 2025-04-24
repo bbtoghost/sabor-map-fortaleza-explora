@@ -1,13 +1,13 @@
-
 import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Award, Star, MapPin, Clock } from "lucide-react";
+import { ArrowLeft, Award, Star, MapPin, Clock, LogOut } from "lucide-react";
 import { restaurants } from "@/data/restaurants";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
+import { useToast } from "@/hooks/use-toast";
+import { Badge } from "@/components/ui/badge";
 
-// Mock user data - in a real app this would come from a database
 const mockUser = {
   id: "u1",
   name: "Amanda Silva",
@@ -15,31 +15,96 @@ const mockUser = {
   avatar: "https://randomuser.me/api/portraits/women/68.jpg",
   points: 245,
   visitedRestaurants: [
-    { restaurantId: "1", date: "10/04/2023", hasReviewed: true },
-    { restaurantId: "3", date: "15/04/2023", hasReviewed: false },
-    { restaurantId: "6", date: "22/04/2023", hasReviewed: true },
+    { restaurantId: "1", date: "10/04/2023", hasReviewed: true, visitCount: 3 },
+    { restaurantId: "3", date: "15/04/2023", hasReviewed: false, visitCount: 1 },
+    { restaurantId: "6", date: "22/04/2023", hasReviewed: true, visitCount: 2 },
   ],
-  reviews: ["c1", "c3"],
+  reviews: [
+    { 
+      id: "c1", 
+      restaurantId: "1",
+      date: "10/04/2023",
+      ratings: {
+        food: 4.5,
+        drinks: 4.0,
+        price: 3.5,
+        ambience: 5.0,
+        service: 4.0,
+        time: 3.5,
+        infrastructure: 4.5
+      },
+      comment: "Excelente experiência gastronômica!",
+      tags: ["Ambiente Familiar", "Vista Mar", "Preço Justo"]
+    },
+    { 
+      id: "c3", 
+      restaurantId: "6",
+      date: "22/04/2023",
+      ratings: {
+        food: 5.0,
+        drinks: 4.5,
+        price: 4.0,
+        ambience: 4.5,
+        service: 5.0,
+        time: 4.0,
+        infrastructure: 4.5
+      },
+      comment: "Serviço impecável e comida maravilhosa",
+      tags: ["Romântico", "Bom Atendimento", "Música ao Vivo"]
+    }
+  ],
   favorites: ["2", "8"]
 };
 
 const UserProfilePage = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
 
   const handleBack = () => {
     navigate(-1);
   };
 
+  const handleLogout = () => {
+    toast({
+      title: "Logout realizado",
+      description: "Você foi desconectado com sucesso",
+    });
+    navigate("/login");
+  };
+
+  const handleEditReview = (restaurantId: string) => {
+    navigate(`/restaurant/${restaurantId}`);
+    toast({
+      description: "Você pode editar sua avaliação na página do restaurante",
+    });
+  };
+
   const lastVisits = mockUser.visitedRestaurants.map(visit => {
     const restaurant = restaurants.find(r => r.id === visit.restaurantId);
+    const review = mockUser.reviews.find(r => r.restaurantId === visit.restaurantId);
     return {
       ...visit,
-      restaurant
+      restaurant,
+      review
     };
   });
 
+  const calculateAverageRating = (ratings: any) => {
+    const values = Object.values(ratings) as number[];
+    return values.reduce((a, b) => a + b, 0) / values.length;
+  };
+
   const pointsToNextReward = 300 - mockUser.points;
   const progressPercentage = (mockUser.points / 300) * 100;
+
+  const renderStars = (rating: number) => {
+    return Array(5).fill(0).map((_, i) => (
+      <Star
+        key={i}
+        className={`w-4 h-4 ${i < Math.round(rating) ? 'text-yellow-400 fill-current' : 'text-gray-300'}`}
+      />
+    ));
+  };
 
   return (
     <div className="flex flex-col min-h-full pb-16">
@@ -92,6 +157,15 @@ const UserProfilePage = () => {
               <div className="text-xs text-muted-foreground">Favoritos</div>
             </div>
           </div>
+
+          <Button 
+            variant="destructive" 
+            className="mt-6 w-full"
+            onClick={handleLogout}
+          >
+            <LogOut className="w-4 h-4 mr-2" />
+            Sair da conta
+          </Button>
         </div>
 
         <Tabs defaultValue="history" className="mt-6">
@@ -100,12 +174,12 @@ const UserProfilePage = () => {
             <TabsTrigger value="reviews">Avaliações</TabsTrigger>
             <TabsTrigger value="rewards">Cupons</TabsTrigger>
           </TabsList>
+          
           <TabsContent value="history" className="mt-4 space-y-4">
             {lastVisits.map((visit) => (
               <div 
                 key={visit.restaurantId} 
-                className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer"
-                onClick={() => navigate(`/restaurant/${visit.restaurantId}`)}
+                className="flex items-center gap-3 p-3 border rounded-lg"
               >
                 <img 
                   src={visit.restaurant?.image} 
@@ -116,22 +190,68 @@ const UserProfilePage = () => {
                   <h3 className="font-semibold">{visit.restaurant?.name}</h3>
                   <div className="flex items-center gap-1 text-sm text-muted-foreground">
                     <Clock size={14} />
-                    <span>{visit.date}</span>
+                    <span>Última visita: {visit.date}</span>
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    {visit.visitCount} {visit.visitCount === 1 ? 'visita' : 'visitas'}
                   </div>
                 </div>
-                {!visit.hasReviewed && (
-                  <Button size="sm" variant="outline">
-                    Avaliar
-                  </Button>
-                )}
               </div>
             ))}
           </TabsContent>
-          <TabsContent value="reviews" className="mt-4">
-            <p className="text-center py-8 text-muted-foreground">
-              Você fez 2 avaliações recentemente. Continue contribuindo para ganhar mais pontos!
-            </p>
+
+          <TabsContent value="reviews" className="mt-4 space-y-4">
+            {mockUser.reviews.map((review) => {
+              const restaurant = restaurants.find(r => r.id === review.restaurantId);
+              return (
+                <div key={review.id} className="border rounded-lg p-4">
+                  <div className="flex justify-between items-start mb-3">
+                    <div>
+                      <h3 className="font-semibold">{restaurant?.name}</h3>
+                      <p className="text-sm text-muted-foreground">{review.date}</p>
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleEditReview(review.restaurantId)}
+                    >
+                      Editar
+                    </Button>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 mb-3">
+                    <div className="text-sm">
+                      <p className="font-medium">Comida</p>
+                      <div className="flex">{renderStars(review.ratings.food)}</div>
+                    </div>
+                    <div className="text-sm">
+                      <p className="font-medium">Drinks</p>
+                      <div className="flex">{renderStars(review.ratings.drinks)}</div>
+                    </div>
+                    <div className="text-sm">
+                      <p className="font-medium">Ambiente</p>
+                      <div className="flex">{renderStars(review.ratings.ambience)}</div>
+                    </div>
+                    <div className="text-sm">
+                      <p className="font-medium">Atendimento</p>
+                      <div className="flex">{renderStars(review.ratings.service)}</div>
+                    </div>
+                  </div>
+
+                  <p className="text-sm mb-2">{review.comment}</p>
+
+                  <div className="flex flex-wrap gap-1">
+                    {review.tags.map((tag, index) => (
+                      <Badge key={index} variant="secondary">
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
           </TabsContent>
+
           <TabsContent value="rewards" className="mt-4">
             <div className="bg-muted p-4 rounded-lg">
               <h3 className="font-semibold">Cupom de 10% off</h3>
