@@ -1,5 +1,5 @@
-
-import { FriendRecommendation } from "./FriendRecommendation";
+import React from 'react';
+import FriendRecommendation from "./FriendRecommendation";
 
 // Mock data for friend recommendations
 const feedPosts = [
