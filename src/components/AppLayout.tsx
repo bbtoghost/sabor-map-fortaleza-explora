@@ -2,7 +2,7 @@
 import { Outlet } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Heart, Map, List, Search, Star, User } from "lucide-react";
+import { Map, List, MessageSquare, Video, User } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 import { useEffect, useState } from "react";
 
@@ -16,10 +16,10 @@ const AppLayout = () => {
       setActiveTab("map");
     } else if (location.pathname === "/home/list") {
       setActiveTab("list");
-    } else if (location.pathname === "/rankings") {
-      setActiveTab("rankings");
-    } else if (location.pathname === "/favorites") {
-      setActiveTab("favorites");
+    } else if (location.pathname === "/home/feed") {
+      setActiveTab("feed");
+    } else if (location.pathname === "/home/videos") {
+      setActiveTab("videos");
     } else if (location.pathname === "/profile") {
       setActiveTab("profile");
     }
@@ -34,11 +34,11 @@ const AppLayout = () => {
       case "list":
         navigate("/home/list");
         break;
-      case "rankings":
-        navigate("/rankings");
+      case "feed":
+        navigate("/home/feed");
         break;
-      case "favorites":
-        navigate("/favorites");
+      case "videos":
+        navigate("/home/videos");
         break;
       case "profile":
         navigate("/profile");
@@ -52,11 +52,8 @@ const AppLayout = () => {
     <div className="flex flex-col h-screen w-full bg-background text-foreground">
       {/* Header */}
       <div className="flex justify-between items-center p-4 border-b">
-        <h1 className="text-2xl font-bold text-primary">SaborMap</h1>
+        <h1 className="text-2xl font-bold text-primary">Me Indica Aí</h1>
         <div className="flex items-center gap-2">
-          <button className="p-2 rounded-full bg-secondary text-secondary-foreground">
-            <Search size={18} />
-          </button>
           <ThemeToggle />
         </div>
       </div>
@@ -78,13 +75,13 @@ const AppLayout = () => {
               <List size={20} />
               <span className="text-xs mt-1">Lista</span>
             </TabsTrigger>
-            <TabsTrigger value="rankings" className="flex flex-col items-center justify-center data-[state=active]:text-primary">
-              <Star size={20} />
-              <span className="text-xs mt-1">Ranking</span>
+            <TabsTrigger value="feed" className="flex flex-col items-center justify-center data-[state=active]:text-primary">
+              <MessageSquare size={20} />
+              <span className="text-xs mt-1">Feed</span>
             </TabsTrigger>
-            <TabsTrigger value="favorites" className="flex flex-col items-center justify-center data-[state=active]:text-primary">
-              <Heart size={20} />
-              <span className="text-xs mt-1">Favoritos</span>
+            <TabsTrigger value="videos" className="flex flex-col items-center justify-center data-[state=active]:text-primary">
+              <Video size={20} />
+              <span className="text-xs mt-1">Vídeos</span>
             </TabsTrigger>
             <TabsTrigger value="profile" className="flex flex-col items-center justify-center data-[state=active]:text-primary">
               <User size={20} />
